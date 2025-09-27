@@ -1,0 +1,172 @@
+name: Laravel Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging'))
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '{{PHP_VERSION}}'
+
+    - name: Install Dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+    - name: Install NPM dependencies
+      run: npm ci
+
+    - name: Build assets
+      run: npm run build
+
+    - name: Deploy to staging server
+      if: {{STAGING_ENABLED}} == 'true'
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        port: ${{ secrets.STAGING_PORT || 22 }}
+        script: |
+          cd {{STAGING_PATH}}
+          git pull origin main
+          composer install --no-dev --optimize-autoloader --no-interaction
+          npm ci
+          npm run build
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          @if(AUTO_MIGRATIONS == 'true')
+          php artisan migrate --force
+          @endif
+          @if(CACHE_CLEAR == 'true')
+          php artisan cache:clear
+          php artisan queue:restart
+          @endif
+          sudo systemctl reload nginx
+
+    - name: Notify Slack
+      if: {{SLACK_ENABLED}} == 'true' && always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+
+    - name: Notify Discord
+      if: {{DISCORD_ENABLED}} == 'true' && always()
+      uses: Ilshidur/action-discord@master
+      with:
+        args: 'Deployment to staging completed! 🚀'
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'))
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '{{PHP_VERSION}}'
+
+    - name: Install Dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+    - name: Install NPM dependencies
+      run: npm ci
+
+    - name: Build assets
+      run: npm run build
+
+    - name: Deploy to production server
+      if: {{PRODUCTION_ENABLED}} == 'true'
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        port: ${{ secrets.PRODUCTION_PORT || 22 }}
+        script: |
+          cd {{PRODUCTION_PATH}}
+          git pull origin main
+          composer install --no-dev --optimize-autoloader --no-interaction
+          npm ci
+          npm run build
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          @if(AUTO_MIGRATIONS == 'true')
+          php artisan migrate --force
+          @endif
+          @if(CACHE_CLEAR == 'true')
+          php artisan cache:clear
+          php artisan queue:restart
+          @endif
+          sudo systemctl reload nginx
+
+    - name: Build and push Docker image
+      if: {{REGISTRY_ENABLED}} == 'true'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          @if(REGISTRY_TYPE == 'dockerhub')
+          {{REGISTRY_USERNAME}}/{{REGISTRY_REPOSITORY}}:latest
+          {{REGISTRY_USERNAME}}/{{REGISTRY_REPOSITORY}}:${{ github.sha }}
+          @elseif(REGISTRY_TYPE == 'ghcr')
+          ghcr.io/{{REGISTRY_USERNAME}}/{{REGISTRY_REPOSITORY}}:latest
+          ghcr.io/{{REGISTRY_USERNAME}}/{{REGISTRY_REPOSITORY}}:${{ github.sha }}
+          @endif
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Notify Slack
+      if: {{SLACK_ENABLED}} == 'true' && always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+
+    - name: Notify Discord
+      if: {{DISCORD_ENABLED}} == 'true' && always()
+      uses: Ilshidur/action-discord@master
+      with:
+        args: 'Deployment to production completed! 🚀'
+
+  health-check:
+    needs: [deploy-staging, deploy-production]
+    runs-on: ubuntu-latest
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    steps:
+    - name: Health check staging
+      if: needs.deploy-staging.result == 'success'
+      run: |
+        curl -f ${{ secrets.STAGING_URL }}/health || exit 1
+
+    - name: Health check production
+      if: needs.deploy-production.result == 'success'
+      run: |
+        curl -f ${{ secrets.PRODUCTION_URL }}/health || exit 1

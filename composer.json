@@ -1,0 +1,53 @@
+{
+    "name": "subhashladumor1/laravel-cidi",
+    "description": "laravel-cidi is a powerful Laravel package that auto-generates Docker setup and CI/CD workflows. Simplify Laravel deployment, pipeline, DevOps, and cloud integration with ready Dockerfile, docker-compose, and GitHub Actions. Fast, scalable, and time-saving for modern Laravel apps.",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "docker",
+        "ci-cd",
+        "github-actions",
+        "devops",
+        "deployment",
+        "automation"
+    ],
+    "license": "MIT",
+     "version":"1.1.5",
+    "authors": [
+        {
+            "name": "Subhash Ladumor",
+            "email": "ahirsubhash7@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Subhashladumor1\\LaravelCidi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Subhashladumor1\\LaravelCidi\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Subhashladumor1\\LaravelCidi\\LaravelCidiServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
