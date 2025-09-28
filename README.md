@@ -1,7 +1,6 @@
 # Laravel CIDI 🚀
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/subhashladumor1/laravel-cidi.svg?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
-[![License](https://img.shields.io/packagist/l/subhashladumor1/laravel-cidi.svg?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
 [![Total Downloads](https://img.shields.io/packagist/dt/subhashladumor1/laravel-cidi.svg?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
 [![PHP Version](https://img.shields.io/packagist/php-v/subhashladumor1/laravel-cidi?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
 [![Laravel Version](https://img.shields.io/badge/Laravel-12.0%2B-red?style=flat-square)](https://laravel.com)
