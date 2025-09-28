@@ -86,3 +86,4 @@ class CidiWorkflowCommandTest extends TestCase
             ->assertExitCode(0);
     }
 }
+

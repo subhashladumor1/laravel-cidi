@@ -65,3 +65,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All core features implemented
 - Comprehensive documentation
 - Full test coverage
+

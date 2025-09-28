@@ -146,3 +146,4 @@ jobs:
     - name: Test Docker image
       run: |
         docker run --rm {{APP_NAME}}:latest php artisan --version
+

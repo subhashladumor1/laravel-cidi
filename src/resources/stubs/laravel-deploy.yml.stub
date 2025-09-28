@@ -170,3 +170,4 @@ jobs:
       if: needs.deploy-production.result == 'success'
       run: |
         curl -f ${{ secrets.PRODUCTION_URL }}/health || exit 1
+

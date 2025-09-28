@@ -98,3 +98,4 @@ class CidiGenerateCommandTest extends TestCase
             ->assertExitCode(0);
     }
 }
+

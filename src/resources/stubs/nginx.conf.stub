@@ -24,3 +24,4 @@ server {
         add_header Cache-Control "public, immutable";
     }
 }
+
