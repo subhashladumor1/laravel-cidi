@@ -5,7 +5,7 @@ namespace Subhashladumor1\LaravelCidi\commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-class BaseCommand extends Command                                                  ommand
+class BaseCommand extends Command                                   
 {
     /**
      * Get the stub file path.
