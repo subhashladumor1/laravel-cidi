@@ -24,7 +24,7 @@ return [
     'database' => [
         'type' => env('CIDI_DB_TYPE', 'mysql'),
         'version' => env('CIDI_DB_VERSION', '8.0'),
-        'port' => env('CIDI_DB_PORT', '3306'),
+        'port' => env('CIDI_DB_PORT', '3307'),
         'database' => env('CIDI_DB_DATABASE', 'laravel'),
         'username' => env('CIDI_DB_USERNAME', 'laravel'),
         'password' => env('CIDI_DB_PASSWORD', 'password'),

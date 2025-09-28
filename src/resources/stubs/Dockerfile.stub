@@ -58,6 +58,18 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 # Copy application files
 COPY . .
 
+# Handle .env file - use .env.docker if .env doesn't exist
+RUN if [ ! -f .env ]; then \
+        if [ -f .env.docker ]; then \
+            cp .env.docker .env; \
+            echo "Copied .env.docker to .env"; \
+        else \
+            echo "Warning: Neither .env nor .env.docker found"; \
+        fi; \
+    else \
+        echo ".env file already exists, keeping existing file"; \
+    fi
+
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
@@ -68,6 +80,8 @@ RUN npm install && npm run build
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
+
+RUN php artisan storage:link || true
 
 # Expose port
 EXPOSE 9000

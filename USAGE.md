@@ -2,6 +2,51 @@
 
 This document provides practical examples of how to use Laravel CIDI in different scenarios.
 
+## Installation Options
+
+The `cidi:install` command supports several optional flags for automated setup:
+
+### Available Options
+
+```bash
+# Basic installation
+php artisan cidi:install
+
+# With database migration
+php artisan cidi:install --migrate
+
+# With database seeding
+php artisan cidi:install --seed
+
+# With both migration and seeding
+php artisan cidi:install --migrate --seed
+
+# With custom commands
+php artisan cidi:install --command="migrate:fresh" --command="db:seed --class=UserSeeder"
+
+# Overwrite existing files
+php artisan cidi:install --force
+
+# Combine all options
+php artisan cidi:install --force --migrate --seed --command="storage:link"
+```
+
+### Custom Commands Examples
+
+```bash
+# Run specific migrations
+php artisan cidi:install --command="migrate --path=database/migrations/custom"
+
+# Run specific seeders
+php artisan cidi:install --command="db:seed --class=UserSeeder"
+
+# Run multiple commands
+php artisan cidi:install --command="migrate:fresh" --command="db:seed" --command="storage:link"
+
+# Run with options
+php artisan cidi:install --command="migrate --force" --command="db:seed --class=UserSeeder"
+```
+
 ## Basic Setup
 
 ### 1. Fresh Laravel Project
@@ -16,6 +61,12 @@ composer require subhashladumor1/laravel-cidi
 
 # Install and configure
 php artisan cidi:install
+
+# Install with automatic migration and seeding
+php artisan cidi:install --migrate --seed
+
+# Install with custom commands
+php artisan cidi:install --command="migrate:fresh" --command="db:seed --class=UserSeeder"
 
 # Generate all configuration files
 php artisan cidi:generate all
