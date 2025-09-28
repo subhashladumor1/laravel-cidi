@@ -39,9 +39,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-x
     intl \
     opcache
 
-# Install Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -65,7 +62,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
 # Install Node.js dependencies
-RUN npm install && npm run production
+RUN npm install && npm run build
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \

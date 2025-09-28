@@ -93,11 +93,11 @@ class CidiInstallCommand extends BaseCommand
      */
     private function createDockerEnvFile(): void
     {
-        $envDockerPath = base_path('.env.docker');
+        $envDockerPath = base_path('.env');
         $force = $this->option('force');
 
         if (File::exists($envDockerPath) && !$force) {
-            $this->warning('.env.docker already exists. Use --force to overwrite.');
+            $this->warning('.env already exists. Use --force to overwrite.');
             return;
         }
 
@@ -124,9 +124,9 @@ class CidiInstallCommand extends BaseCommand
         $envDockerContent = $this->replacePlaceholders($envDockerContent, $replacements);
 
         if ($this->writeFile($envDockerPath, $envDockerContent)) {
-            $this->success('.env.docker file created successfully!');
+            $this->success('.env file created successfully!');
         } else {
-            $this->error('Failed to create .env.docker file.');
+            $this->error('Failed to create .env file.');
         }
     }
 }
