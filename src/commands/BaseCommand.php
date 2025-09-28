@@ -5,12 +5,12 @@ namespace Subhashladumor1\LaravelCidi\commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-abstract class BaseCommand extends Command
+class BaseCommand extends Command                                                  ommand
 {
     /**
      * Get the stub file path.
      */
-    protected function getStubPath(string $stub): string
+    public function getStubPath(string $stub): string
     {
         return __DIR__ . '/../resources/stubs/' . $stub;
     }
@@ -18,7 +18,7 @@ abstract class BaseCommand extends Command
     /**
      * Get the stub content.
      */
-    protected function getStubContent(string $stub): string
+    public function getStubContent(string $stub): string
     {
         $stubPath = $this->getStubPath($stub);
         
@@ -32,10 +32,11 @@ abstract class BaseCommand extends Command
     /**
      * Replace placeholders in stub content.
      */
-    protected function replacePlaceholders(string $content, array $replacements): string
+    public function replacePlaceholders(string $content, array $replacements): string
     {
         foreach ($replacements as $placeholder => $replacement) {
-            $content = str_replace("{{$placeholder}}", $replacement, $content);
+            $search = "{{" . $placeholder . "}}";
+            $content = str_replace($search, $replacement, $content);
         }
 
         return $content;
@@ -44,7 +45,7 @@ abstract class BaseCommand extends Command
     /**
      * Write content to file.
      */
-    protected function writeFile(string $path, string $content): bool
+    public function writeFile(string $path, string $content): bool
     {
         $directory = dirname($path);
         
@@ -58,7 +59,7 @@ abstract class BaseCommand extends Command
     /**
      * Get configuration value.
      */
-    protected function config(string $key, $default = null)
+    public function config(string $key, $default = null)
     {
         return config("cidi.{$key}", $default);
     }
@@ -66,7 +67,7 @@ abstract class BaseCommand extends Command
     /**
      * Display success message.
      */
-    protected function success(string $message): void
+    public function success(string $message): void
     {
         $this->info("✅ {$message}");
     }
@@ -74,16 +75,8 @@ abstract class BaseCommand extends Command
     /**
      * Display warning message.
      */
-    protected function warning(string $message): void
+    public function warning(string $message): void
     {
         $this->warn("⚠️  {$message}");
-    }
-
-    /**
-     * Display error message.
-     */
-    protected function error(string $message): void
-    {
-        $this->error("❌ {$message}");
     }
 }

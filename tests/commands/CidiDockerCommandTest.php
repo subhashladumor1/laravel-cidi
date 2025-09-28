@@ -82,3 +82,4 @@ class CidiDockerCommandTest extends TestCase
             ->assertExitCode(0);
     }
 }
+

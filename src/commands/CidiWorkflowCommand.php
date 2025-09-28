@@ -104,3 +104,4 @@ class CidiWorkflowCommand extends BaseCommand
         return $replacements;
     }
 }
+

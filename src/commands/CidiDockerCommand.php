@@ -168,3 +168,4 @@ class CidiDockerCommand extends BaseCommand
         return $replacements;
     }
 }
+

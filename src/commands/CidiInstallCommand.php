@@ -130,3 +130,4 @@ class CidiInstallCommand extends BaseCommand
         }
     }
 }
+

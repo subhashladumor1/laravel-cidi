@@ -70,3 +70,4 @@ class CidiInstallCommandTest extends TestCase
         $this->assertStringContainsString('REDIS_HOST=redis', $envDockerContent);
     }
 }
+
