@@ -3,7 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/subhashladumor1/laravel-cidi.svg?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
 [![Total Downloads](https://img.shields.io/packagist/dt/subhashladumor1/laravel-cidi.svg?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
 [![PHP Version](https://img.shields.io/packagist/php-v/subhashladumor1/laravel-cidi?style=flat-square)](https://packagist.org/packages/subhashladumor1/laravel-cidi)
-[![Laravel Version](https://img.shields.io/badge/Laravel-12.0%2B-red?style=flat-square)](https://laravel.com)
+[![Laravel Version](https://img.shields.io/badge/Laravel-10.0%2B-red?style=flat-square)](https://laravel.com)
 
 > **A powerful Laravel package that auto-generates Docker setup and CI/CD workflows for any Laravel project. Simplify Laravel deployment, pipeline, DevOps, and cloud integration with ready Dockerfile, docker-compose, and GitHub Actions. Fast, scalable, and time-saving for modern Laravel apps.**
 
