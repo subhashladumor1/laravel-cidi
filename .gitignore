@@ -55,3 +55,5 @@ yarn.lock
 
 # PHPUnit
 .phpunit.cache
+
+/public/storage
