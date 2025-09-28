@@ -20,7 +20,7 @@ services:
       - mysql
       - redis
     env_file:
-      - .env.docker
+      - .env
 
   nginx:
     image: nginx:alpine
@@ -41,7 +41,7 @@ services:
     container_name: {{APP_NAME}}_mysql
     restart: unless-stopped
     ports:
-      - "{{MYSQL_PORT}}:3306"
+      - "{{DB_PORT}}:3306"
     environment:
       MYSQL_DATABASE: {{DB_DATABASE}}
       MYSQL_USER: {{DB_USERNAME}}
@@ -87,7 +87,7 @@ services:
       - APP_ENV=local
       - APP_DEBUG=true
     env_file:
-      - .env.docker
+      - .enn
     command: php artisan horizon
     depends_on:
       - mysql

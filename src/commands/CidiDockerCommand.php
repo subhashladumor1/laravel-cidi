@@ -34,6 +34,9 @@ class CidiDockerCommand extends BaseCommand
         // Generate .dockerignore
         $this->generateDockerIgnore();
 
+        // Generate nginx configuration
+        $this->generateNginxConfig();
+
         $this->success('Docker configuration files generated successfully!');
         $this->line('');
         $this->line('Next steps:');
@@ -119,6 +122,29 @@ class CidiDockerCommand extends BaseCommand
     }
 
     /**
+     * Generate nginx configuration.
+     */
+    private function generateNginxConfig(): void
+    {
+        $nginxDir = base_path('docker/nginx');
+        $nginxConfigPath = $nginxDir . '/default.conf';
+        $force = $this->option('force');
+
+        if (File::exists($nginxConfigPath) && !$force) {
+            $this->warning('nginx configuration already exists. Use --force to overwrite.');
+            return;
+        }
+
+        $nginxContent = $this->getStubContent('nginx.conf.stub');
+
+        if ($this->writeFile($nginxConfigPath, $nginxContent)) {
+            $this->success('nginx configuration generated successfully!');
+        } else {
+            $this->error('Failed to generate nginx configuration.');
+        }
+    }
+
+    /**
      * Build Docker Compose content dynamically based on enabled services.
      */
     private function buildDockerComposeContent(): string
@@ -179,7 +205,7 @@ class CidiDockerCommand extends BaseCommand
       - mysql
       - redis
     env_file:
-      - .env.docker
+      - .env
 
 YAML;
     }
