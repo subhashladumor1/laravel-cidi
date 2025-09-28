@@ -10,7 +10,10 @@ class CidiInstallCommand extends BaseCommand
      * The name and signature of the console command.
      */
     protected $signature = 'cidi:install 
-                            {--force : Overwrite existing files}';
+                            {--force : Overwrite existing files}
+                            {--migrate : Run database migrations after installation}
+                            {--seed : Run database seeders after installation}
+                            {--command=* : Custom commands to run after installation}';
 
     /**
      * The console command description.
@@ -32,6 +35,9 @@ class CidiInstallCommand extends BaseCommand
 
         // Create .env.docker file
         $this->createDockerEnvFile();
+
+        // Run optional post-installation tasks
+        $this->runPostInstallationTasks();
 
         $this->success('Laravel CIDI package installed successfully!');
         $this->line('');
@@ -93,11 +99,11 @@ class CidiInstallCommand extends BaseCommand
      */
     private function createDockerEnvFile(): void
     {
-        $envDockerPath = base_path('.env');
+        $envDockerPath = base_path('.env.docker');
         $force = $this->option('force');
 
         if (File::exists($envDockerPath) && !$force) {
-            $this->warning('.env already exists. Use --force to overwrite.');
+            $this->warning('.env.docker already exists. Use --force to overwrite.');
             return;
         }
 
@@ -124,9 +130,115 @@ class CidiInstallCommand extends BaseCommand
         $envDockerContent = $this->replacePlaceholders($envDockerContent, $replacements);
 
         if ($this->writeFile($envDockerPath, $envDockerContent)) {
-            $this->success('.env file created successfully!');
+            $this->success('.env.docker file created successfully!');
         } else {
-            $this->error('Failed to create .env file.');
+            $this->error('Failed to create .env.docker file.');
+        }
+    }
+
+    /**
+     * Run post-installation tasks based on options.
+     */
+    private function runPostInstallationTasks(): void
+    {
+        $this->line('');
+        $this->info('🔧 Running post-installation tasks...');
+
+        // Run migrations if requested
+        if ($this->option('migrate')) {
+            $this->runMigrations();
+        }
+
+        // Run seeders if requested
+        if ($this->option('seed')) {
+            $this->runSeeders();
+        }
+
+        // Run custom commands if provided
+        $customCommands = $this->option('command');
+        if (!empty($customCommands)) {
+            $this->runCustomCommands($customCommands);
+        }
+    }
+
+    /**
+     * Run database migrations.
+     */
+    private function runMigrations(): void
+    {        
+        try {
+            
+            $this->line('');
+            $this->warn('⚠️  WARNING: This process will ERASE all existing data.');
+            $this->line("\033[33mIf you have previously run this command or migrated tables,\033[0m");
+            $this->line("\033[33mall of your current data will be lost.\033[0m");
+            if ($this->confirm('📦 Do you want to run migration?')) {
+                $this->line('');
+                $this->warn('⛔ Dropping all existing tables...');
+                $this->callSilent('db:wipe');
+                $this->info('✅ Database wiped successfully.');
+                $this->line('📊 Running database migrations...');
+                $this->call('migrate', ['--force' => true]);
+            }
+            $this->success('Database migrations completed successfully!');
+
+        } catch (\Exception $e) {
+            $this->error('Failed to run migrations: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Run database seeders.
+     */
+    private function runSeeders(): void
+    {
+        $this->line('🌱 Running database seeders...');
+        
+        try {
+            $this->call('db:seed', ['--force' => true]);
+            $this->success('Database seeding completed successfully!');
+        } catch (\Exception $e) {
+            $this->error('Failed to run seeders: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Run custom commands.
+     */
+    private function runCustomCommands(array $commands): void
+    {
+        $this->line('⚙️  Running custom commands...');
+        
+        foreach ($commands as $command) {
+            $this->line("Running: {$command}");
+            
+            try {
+                // Parse command and arguments
+                $parts = explode(' ', $command);
+                $commandName = array_shift($parts);
+                $arguments = [];
+                $options = [];
+                
+                // Simple argument parsing
+                foreach ($parts as $part) {
+                    if (str_starts_with($part, '--')) {
+                        $option = substr($part, 2);
+                        if (str_contains($option, '=')) {
+                            [$key, $value] = explode('=', $option, 2);
+                            $options[$key] = $value;
+                        } else {
+                            $options[$option] = true;
+                        }
+                    } else {
+                        $arguments[] = $part;
+                    }
+                }
+                
+                $this->call($commandName, array_merge($arguments, $options));
+                $this->success("Command '{$command}' completed successfully!");
+            } catch (\Exception $e) {
+                $this->error("Failed to run command '{$command}': " . $e->getMessage());
+            }
         }
     }
 }
