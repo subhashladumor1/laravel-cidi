@@ -25,3 +25,4 @@ abstract class TestCase extends Orchestra
         $app['config']->set('app.key', 'base64:YourAppKeyHere');
     }
 }
+
